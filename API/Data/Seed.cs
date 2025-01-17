@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using API.Entities;
@@ -13,7 +13,9 @@ public class Seed
         if (await context.Users.AnyAsync()) return;
 
         var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        var options = new JsonSerializerOptions{PropertyNameCaseInsensitive = true};
+
         var users = JsonSerializer.Deserialize<List<AppUser>>(userData, options);
 
         if (users == null) return;
@@ -28,6 +30,7 @@ public class Seed
 
             context.Users.Add(user);
         }
+
         await context.SaveChangesAsync();
     }
 }

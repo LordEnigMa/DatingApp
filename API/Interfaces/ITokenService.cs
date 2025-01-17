@@ -1,9 +1,8 @@
-using API.Entities;
+﻿using API.Entities;
 
-namespace API.Interfaces;
+namespace API;
 
 public interface ITokenService
 {
     string CreateToken(AppUser user);
-    
 }

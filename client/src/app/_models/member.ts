@@ -4,7 +4,7 @@ export interface Member {
     id: number
     username: string
     age: number
-    photoURL: string
+    photoUrl: string
     knownAs: string
     created: Date
     lastActive: Date
@@ -15,5 +15,4 @@ export interface Member {
     city: string
     country: string
     photos: Photo[]
-}
-
+  }
