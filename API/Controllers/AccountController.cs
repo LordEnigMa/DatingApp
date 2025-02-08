@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(DataContext context, ITokenService tokenService, IMapper mapper) : BaseApiController
+public class AccountController(DataContext context, ITokenService tokenService, 
+    IMapper mapper) : BaseApiController
 {
     [HttpPost("register")] // account/register
     public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
@@ -17,11 +18,12 @@ public class AccountController(DataContext context, ITokenService tokenService, 
         if (await UserExists(registerDto.Username)) return BadRequest("Username is taken");
 
         using var hmac = new HMACSHA512();
-        
+
         var user = mapper.Map<AppUser>(registerDto);
+
         user.UserName = registerDto.Username.ToLower();
         user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
-
+        user.PasswordSalt = hmac.Key;
 
         context.Users.Add(user);
         await context.SaveChangesAsync();
@@ -29,8 +31,9 @@ public class AccountController(DataContext context, ITokenService tokenService, 
         return new UserDto
         {
             Username = user.UserName,
+            Token = tokenService.CreateToken(user),
             KnownAs = user.KnownAs,
-            Token = tokenService.CreateToken(user)
+            Gender = user.Gender
         };
     }
 
@@ -58,6 +61,7 @@ public class AccountController(DataContext context, ITokenService tokenService, 
             Username = user.UserName,
             KnownAs = user.KnownAs,
             Token = tokenService.CreateToken(user),
+            Gender = user.Gender,
             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
